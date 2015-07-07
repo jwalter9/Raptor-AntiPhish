@@ -1,0 +1,25 @@
+
+-- here's an example of usage where 'body' is an HTML page
+-- Note the 4th argument is the FULL headers and body of the email
+-- This makes the function simpler and more flexible
+
+CREATE FUNCTION `sendEmail` (nick VARCHAR(256), eaddr VARCHAR(256), 
+	subject VARCHAR(256), body TEXT)
+	RETURNS INT
+NO SQL
+BEGIN
+	RETURN emailer('info@lowadobe.com', eaddr, 'localhost:25',
+		CONCAT('To: "',REPLACE(nick,'"',''),'" <',eaddr,'>\r\n',
+		'Subject: ',subject,'\r\n',
+		'Date: ',DATE_FORMAT(UTC_TIMESTAMP(),'%a, %e %b %Y %T UTC'),'\r\n',
+		'Message-Id: ',msgId(),'\r\n',
+		'Content-Type: text/html; charset="us-ascii"\r\n',
+		'From: "The Help" <info@lowadobe.us>\r\n',
+		body,'\r\n'));
+END$$
+
+emailer does not handle encrypted or credentialled transactions.
+For these types of uses, it's recommended that a local mail server
+like sendmail is installed and configured to forward emailer's
+transactions.
+
